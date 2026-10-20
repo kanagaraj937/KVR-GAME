@@ -1,79 +1,104 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>PRIVATE BUS - 100% WORKING</title>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>KALVARAYAN PRIVATE BUS - ULTIMATE</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box;touch-action:none}
-body{background:#0a1a0a;overflow:hidden}
+*{margin:0;padding:0;box-sizing:border-box}body{background:#000;overflow:hidden;font-family:'Segoe UI',monospace}
 canvas{display:block;width:100vw;height:100vh}
-#ui{position:fixed;top:8px;left:8px;color:#ffcc00;background:#000;padding:6px 10px;border-radius:8px;font-family:monospace;font-size:12px;z-index:10;border:1px solid #ffcc00}
-#controls{position:fixed;bottom:0;width:100%;height:100px;display:flex;justify-content:space-between;align-items:center;padding:0 10px;z-index:10}
-.btn{width:80px;height:80px;border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:32px;background:rgba(255,204,0,0.25);border:3px solid #ffcc00;user-select:none}
-#gasBox{position:fixed;right:10px;bottom:120px;z-index:10;display:flex;flex-direction:column;gap:10px}
-#start{position:fixed;inset:0;background:#000;z-index:20;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff}
+#hud{position:fixed;top:0;width:100%;display:flex;justify-content:space-between;padding:10px;z-index:10;color:#fff;pointer-events:none}
+.card{background:rgba(0,0,0,0.85);border:1px solid #ffcc00;border-radius:10px;padding:6px 12px;font-size:11px}
+.card b{color:#ffcc00}
+#controls{position:fixed;bottom:0;width:100%;height:110px;background:linear-gradient(transparent,rgba(0,0,0,0.9));display:flex;justify-content:space-between;align-items:end;padding:10px 12px;z-index:10}
+.btn{width:72px;height:72px;border-radius:18px;background:rgba(255,255,255,0.08);backdrop-filter:blur(10px);border:2px solid rgba(255,204,0,0.5);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:22px;user-select:none}
+.btn:active{transform:scale(0.92);background:#ffcc00;color:#000}
+#wheel{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);width:110px;height:110px;border-radius:50%;border:3px dashed rgba(255,204,0,0.3);display:flex;align-items:center;justify-content:center;font-size:42px;z-index:10;background:radial-gradient(rgba(0,0,0,0.8),transparent)}
+#start{position:fixed;inset:0;background:radial-gradient(at 50% 0%, #2a1a00, #000);z-index:30;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;text-align:center;padding:20px}
+#start h1{font-size:42px;color:#ffcc00;line-height:0.9;letter-spacing:-1px} #start p{opacity:0.6;margin:10px;font-size:12px}
+button{background:#ffcc00;color:#000;border:none;padding:16px 32px;border-radius:14px;font-weight:900;font-size:16px;letter-spacing:1px}
 </style>
 </head>
 <body>
-<div id="ui">SPEED: <span id="sp">0</span> | BUS X: <span id="bx">0</span></div>
-<div id="gasBox"><div class="btn" id="gas" style="background:#ffcc00;color:#000;width:90px">GAS ⚡</div><div class="btn" id="brake" style="border-color:red">🛑</div></div>
-<div id="controls"><div class="btn" id="left">◀️</div><div class="btn" id="right">▶️</div></div>
-<div id="start"><h1 style="color:#ffcc00;font-size:36px">🚌 PRIVATE BUS<br>100% WORKING</h1><p style="margin:10px;opacity:0.7">GAS PUDICHU ODU DA!</p><button onclick="document.getElementById('start').style.display='none';run=true" style="background:#ffcc00;color:#000;border:none;padding:14px 28px;font-weight:900;border-radius:10px;font-size:18px">START 🚌</button></div>
+<div id="hud"><div class="card"><b id="speed">0</b> KM/H<br><span id="gear">N</span> GEAR</div><div class="card" style="text-align:center;border-color:#00ff88"><b id="bend">1/21</b><br><span id="stop">VELLIMALAI</span></div><div class="card" style="text-align:right">DIST: <b id="dist">0.0</b> KM<br>PASS: <b id="pass">12</b></div></div>
+<div id="wheel">🎮</div>
+<div id="controls"><div style="display:flex;gap:10px"><div class="btn" id="L"><span>⬅️</span><small style="font-size:8px">LEFT</small></div><div class="btn" id="R"><span>➡️</span><small style="font-size:8px">RIGHT</small></div></div><div style="display:flex;gap:10px"><div class="btn" id="brake" style="border-color:#ff4444"><span>🛑</span><small style="font-size:8px">BRAKE</small></div><div class="btn" id="horn" style="background:#ffcc00;color:#000"><span>📯</span><small style="font-size:8px">HORN</small></div></div></div>
+<div id="start"><div style="background:#ffcc00;color:#000;padding:3px 12px;border-radius:20px;font-size:10px;font-weight:900;margin-bottom:10px">KALLAKURICHI → KALVARAYAN HILLS</div><h1>PRIVATE<br>BUS<br>SIMULATOR</h1><p>ULTIMATE EDITION • 21 HAIRPIN BENDS<br>Real Physics • Passengers • Tea Shops</p><div style="display:flex;gap:8px;margin:12px"><div style="background:#111;border:1px solid #333;padding:6px 10px;border-radius:8px;font-size:10px">🚌 MANJAL BUS</div><div style="background:#111;border:1px solid #333;padding:6px 10px;border-radius:8px;font-size:10px">⛰️ REAL HILLS</div><div style="background:#111;border:1px solid #333;padding:6px 10px;border-radius:8px;font-size:10px">📯 AIR HORN</div></div><button onclick="go()">DRIVE NOW 🚌💨</button><p style="margin-top:10px;font-size:9px">GAS = Wheel ku mela swipe | Steering = Left/Right</p></div>
 <canvas id="c"></canvas>
 <script>
-let cv=document.getElementById('c'),ctx=cv.getContext('2d'),W=innerWidth,H=innerHeight;
-cv.width=W;cv.height=H;
-let busX=W/2,speed=0,roadY=0,bend=0,run=false;
-let keys={l:false,r:false,gas:false,brake:false};
-function loop(){
-requestAnimationFrame(loop);
-if(!run){ctx.fillStyle='#000';ctx.fillRect(0,0,W,H);ctx.fillStyle='#ffcc00';ctx.font='20px monospace';ctx.textAlign='center';ctx.fillText('Press START',W/2,H/2);return;}
-if(keys.gas) speed=Math.min(12,speed+0.25); else if(keys.brake) speed=Math.max(0,speed-0.5); else speed*=0.98;
-if(keys.l) busX-=6+speed*0.3; if(keys.r) busX+=6+speed*0.3;
-busX=Math.max(60,Math.min(W-60,busX));
-roadY+=speed; bend=Math.sin(roadY*0.01)*W*0.18;
-// DRAW
-ctx.fillStyle='#0a2a0a';ctx.fillRect(0,0,W,H);
-// hills bg
-ctx.fillStyle='#122e12';ctx.beginPath();ctx.moveTo(0,H*0.35+bend*0.1);for(let x=0;x<=W;x+=20)ctx.lineTo(x,H*0.35+Math.sin(x*0.01+roadY*0.01)*30);ctx.lineTo(W,H*0.35);ctx.lineTo(0,H*0.35);ctx.fill();
+let cv=document.getElementById('c'),ctx=cv.getContext('2d'),W=innerWidth,H=innerHeight;cv.width=W;cv.height=H;
+let run=false,busX=W/2,speed=0,road=0,bendN=1,dist=0,pass=12,tilt=0;
+let stops=["Vellimalai","Injapattu","Koottathur","Maniyarpalayam","Periya Nagalur","Koolipatti","Melnilavur","Kilavur","Top Hill"];
+let stopIdx=0;
+let input={l:false,r:false,gas:false,brake:false,gasPower:0};
+function go(){document.getElementById('start').style.display='none';run=true}
+function draw(){
+requestAnimationFrame(draw);
+if(!run){ctx.fillStyle='#0a0a0a';ctx.fillRect(0,0,W,H);return}
+// PHYSICS - SUPER SMOOTH
+if(input.gas) input.gasPower=Math.min(1,input.gasPower+0.03); else input.gasPower=Math.max(0,input.gasPower-0.02);
+if(input.brake) speed=Math.max(0,speed-0.35); else speed+=input.gasPower*0.22;
+speed=Math.max(0,Math.min(14,speed)); speed*=0.998; // friction
+if(input.l) busX-= (5+speed*0.6); if(input.r) busX+= (5+speed*0.6);
+busX=Math.max(W*0.15,Math.min(W*0.85,busX));
+road+=speed; dist+=speed*0.008;
+let curve=Math.sin(road*0.008)*W*0.22 + Math.sin(road*0.02)*W*0.08;
+tilt+=(curve*0.0003 - tilt)*0.08;
+if(Math.floor(road/600)%1==0 && Math.floor(road/600)>bendN){bendN=Math.min(21,Math.floor(road/600)+1); stopIdx=(stopIdx+1)%stops.length; if(bendN==21){alert('🏆 CHAMPION DA! KALVARAYAN HILL TOP VANTHUTTA! 21 BENDS MUDICHITA!');bendN=1;road=0;}}
+// BG
+let g=ctx.createLinearGradient(0,0,0,H*0.5);g.addColorStop(0,'#0d1f0d');g.addColorStop(1,'#1a3a1a');ctx.fillStyle=g;ctx.fillRect(0,0,W,H*0.52);
+// hills parallax
+ctx.fillStyle='#0f2e0f';for(let i=0;i<4;i++){ctx.beginPath();ctx.moveTo(0,H*0.52);for(let x=0;x<=W;x+=10){ctx.lineTo(x, H*0.42+Math.sin(x*0.005+i+road*0.001*(i+1))*18 - i*8);}ctx.lineTo(W,H*0.52);ctx.fill();}
 // road
-let roadW=W*0.65;let roadX=W*0.175+bend*0.3;
-ctx.fillStyle='#2a2a2a';ctx.fillRect(roadX-10,0,roadW+20,H);
-ctx.fillStyle='#333';ctx.fillRect(roadX,0,roadW,H);
-ctx.strokeStyle='#ffcc00';ctx.setLineDash([20,20]);ctx.beginPath();ctx.moveTo(roadX+roadW/2+bend*0.1,0);ctx.lineTo(roadX+roadW/2+bend*0.1,H);ctx.stroke();ctx.setLineDash([]);
-// road lines white
-for(let y=-40+roadY%80;y<H;y+=80){ctx.fillStyle='#fff';ctx.fillRect(roadX-6,y,6,30);ctx.fillRect(roadX+roadW,y,6,30);}
-// bend boards
-if(Math.floor(roadY/500)%2==0){ctx.fillStyle='#fff';ctx.fillRect(W/2+bend-40, (roadY%500),80,28);ctx.fillStyle='#000';ctx.font='14px monospace';ctx.textAlign='center';ctx.fillText(Math.floor(roadY/500)%22+"/21 BEND",W/2+bend, (roadY%500)+18);}
-// BUS - top view but looks like bus
-let by=H-130;
-ctx.save();ctx.translate(busX,by);ctx.rotate((busX-W/2)*0.0005 + bend*0.0002);
+let rw=W*0.7, rx=W*0.15+curve*0.25;
+ctx.fillStyle='#1a1a1a';ctx.fillRect(rx-20,-10,rw+40,H+20);
+ctx.fillStyle='#2b2b2b';ctx.fillRect(rx,0,rw,H);
+// yellow center - animated
+ctx.strokeStyle='#ffcc00';ctx.lineWidth=3;ctx.setLineDash([28,22]);ctx.lineDashOffset=-road*2;ctx.beginPath();ctx.moveTo(rx+rw/2,0);ctx.lineTo(rx+rw/2+curve*0.05,H);ctx.stroke();ctx.setLineDash([]);
+// white edge
+ctx.fillStyle='#fff';for(let y=-30+road%60;y<H;y+=60){ctx.fillRect(rx-4,y,4,24);ctx.fillRect(rx+rw,y,4,24);}
+// bend board 3D
+let boardY= (700 - road%700); if(boardY>0 && boardY<H){ctx.save();ctx.translate(W/2+curve,boardY);ctx.fillStyle='#fff';ctx.fillRect(-48,-18,96,36);ctx.strokeStyle='#cc0000';ctx.lineWidth=3;ctx.strokeRect(-48,-18,96,36);ctx.fillStyle='#000';ctx.font='bold 13px monospace';ctx.textAlign='center';ctx.fillText(bendN+"/21",0,2);ctx.font='8px monospace';ctx.fillText("HAIRPIN",0,12);ctx.restore();}
+// trees / tea kadai
+for(let i=0;i<6;i++){let ty=(i*180+road)%(H+200)-50;let tx=rx-30+ (i%2==0?-1:1)*(20+Math.random()*30)+curve*0.2;ctx.fillStyle=i%3==0?'#5a2a0a':'#0a4a0a';ctx.fillRect(tx,ty,12,18);if(i%3==0){ctx.fillStyle='#ffcc00';ctx.font='7px monospace';ctx.fillText("TEA",tx-4,ty-4);} }
+// BUS - Ultimate top view with shadow & detail
+let by=H-125;
+ctx.save();ctx.translate(busX,by);ctx.rotate(tilt+ (busX-W/2)*0.0004);
 // shadow
-ctx.fillStyle='rgba(0,0,0,0.5)';ctx.fillRect(-42,10,84,20);
-// body yellow
-ctx.fillStyle='#ffcc00';ctx.fillRect(-40,-28,80,56);
-// red stripe
-ctx.fillStyle='#cc0000';ctx.fillRect(-40,-8,80,10);
-// windows blue
-ctx.fillStyle='#87ceeb';ctx.fillRect(-35,-26,70,14);
-// front
-ctx.fillStyle='#fff';ctx.fillRect(-38,22,76,12);
+ctx.fillStyle='rgba(0,0,0,0.45)';ctx.beginPath();ctx.ellipse(0,26,52,14,0,0,Math.PI*2);ctx.fill();
+// body
+ctx.fillStyle='#ffcc00';ctx.fillRect(-46,-32,92,64);
+ctx.fillStyle='#111';ctx.fillRect(-46,-32,92,4);ctx.fillRect(-46,28,92,4);
+// red stripe with black border
+ctx.fillStyle='#000';ctx.fillRect(-46,-9,92,12);ctx.fillStyle='#e60000';ctx.fillRect(-44,-7,88,8);
+// windows
+ctx.fillStyle='#a0d8ef';ctx.fillRect(-42,-28,84,16);
+ctx.fillStyle='#000';for(let wx=-36;wx<=30;wx+=18){ctx.fillRect(wx,-28,2,16);}
+// front glass
+ctx.fillStyle='#c9e8ff';ctx.fillRect(-40,24,80,10);
 // lights
-ctx.fillStyle=speed>2?'#ffff99':'#555';ctx.fillRect(-30,32,12,6);ctx.fillRect(18,32,12,6);
-// text
-ctx.fillStyle='#0000aa';ctx.font='8px monospace';ctx.textAlign='center';ctx.fillText('KALVARAYAN',0,0);
+let lightOn=speed>0.5;ctx.fillStyle=lightOn?'#fffb00':'#333';ctx.fillRect(-36,32,14,5);ctx.fillRect(22,32,14,5);
+if(lightOn){ctx.fillStyle='rgba(255,251,0,0.15)';ctx.fillRect(-50,36,30,50);ctx.fillRect(20,36,30,50);}
+// name board
+ctx.fillStyle='#000080';ctx.fillRect(-32,-2,64,8);ctx.fillStyle='#fff';ctx.font='bold 6px monospace';ctx.textAlign='center';ctx.fillText('KVR EXPRESS',0,3);
 ctx.restore();
-document.getElementById('sp').textContent=Math.floor(speed*8);
-document.getElementById('bx').textContent=Math.floor(busX);
+// HUD update
+document.getElementById('speed').textContent=Math.floor(speed*9);
+document.getElementById('gear').textContent=speed<1?'N':speed<4?'1':speed<7?'2':speed<10?'3':'4';
+document.getElementById('bend').textContent=bendN+"/21";
+document.getElementById('stop').textContent=stops[stopIdx];
+document.getElementById('dist').textContent=dist.toFixed(1);
+document.getElementById('pass').textContent=pass;
 }
-loop();
-// touch
-function bind(id,k){let e=document.getElementById(id);e.addEventListener('touchstart',ev=>{ev.preventDefault();keys[k]=true;},{passive:false});e.addEventListener('touchend',ev=>{ev.preventDefault();keys[k]=false;});e.addEventListener('mousedown',()=>keys[k]=true);e.addEventListener('mouseup',()=>keys[k]=false);e.addEventListener('mouseleave',()=>keys[k]=false);}
-bind('left','l');bind('right','r');bind('gas','gas');bind('brake','brake');
-window.addEventListener('keydown',e=>{if(e.key=='ArrowLeft'||e.key=='a')keys.l=true;if(e.key=='ArrowRight'||e.key=='d')keys.r=true;if(e.key=='ArrowUp'||e.key=='w')keys.gas=true;if(e.key=='ArrowDown'||e.key=='s')keys.brake=true;});
-window.addEventListener('keyup',e=>{if(e.key=='ArrowLeft'||e.key=='a')keys.l=false;if(e.key=='ArrowRight'||e.key=='d')keys.r=false;if(e.key=='ArrowUp'||e.key=='w')keys.gas=false;if(e.key=='ArrowDown'||e.key=='s')keys.brake=false;});
-window.addEventListener('resize',()=>{W=innerWidth;H=innerHeight;cv.width=W;cv.height=H;});
+draw();
+// INPUT - FIXED & SMOOTH
+function bind(id,k){let el=document.getElementById(id);let on=e=>{e.preventDefault();input[k]=true};let off=e=>{e.preventDefault();input[k]=false};el.addEventListener('touchstart',on,{passive:false});el.addEventListener('touchend',off,{passive:false});el.addEventListener('mousedown',on);el.addEventListener('mouseup',off);el.addEventListener('mouseleave',off);}
+bind('L','l');bind('R','r');bind('brake','brake');
+// wheel = gas
+let wheel=document.getElementById('wheel');wheel.addEventListener('touchstart',e=>{e.preventDefault();input.gas=true},{passive:false});wheel.addEventListener('touchend',e=>{e.preventDefault();input.gas=false});wheel.addEventListener('mousedown',()=>input.gas=true);wheel.addEventListener('mouseup',()=>input.gas=false);
+document.getElementById('horn').addEventListener('touchstart',e=>{e.preventDefault();navigator.vibrate&&navigator.vibrate(80);wheel.textContent='🔊📯';setTimeout(()=>wheel.textContent='🎮',300);});
+addEventListener('keydown',e=>{if(e.key=='ArrowLeft'||e.key=='a')input.l=true;if(e.key=='ArrowRight'||e.key=='d')input.r=true;if(e.key=='ArrowUp'||e.key=='w'||e.key==' ')input.gas=true;if(e.key=='ArrowDown'||e.key=='s')input.brake=true;});
+addEventListener('keyup',e=>{if(e.key=='ArrowLeft'||e.key=='a')input.l=false;if(e.key=='ArrowRight'||e.key=='d')input.r=false;if(e.key=='ArrowUp'||e.key=='w'||e.key==' ')input.gas=false;if(e.key=='ArrowDown'||e.key=='s')input.brake=false;});
+addEventListener('resize',()=>{W=innerWidth;H=innerHeight;cv.width=W;cv.height=H;});
 </script>
 </body>
 </html>
