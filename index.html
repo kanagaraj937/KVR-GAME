@@ -1,51 +1,53 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>KVR DODGE - by Kanagaraj</title>
+<title>KVR DODGE - MASS EDITION 🔥</title>
 <style>
-body{margin:0;background:#0f0f0f;color:white;font-family:sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;overflow:hidden}
-#header{font-size:22px;margin:10px;color:#00ff88}
-#gameBox{position:relative;width:350px;height:550px;background:#222;border:3px solid #00ff88;border-radius:15px;overflow:hidden}
-#car{position:absolute;width:50px;height:80px;bottom:20px;left:150px;background:#00ff88;border-radius:10px;z-index:10;display:flex;align-items:center;justify-content:center;color:#000;font-weight:bold;font-size:10px}
-.obstacle{position:absolute;width:50px;height:50px;background:#ff0040;border-radius:8px}
-#score{position:absolute;top:10px;left:10px;font-size:18px;z-index:20}
-#controls{display:flex;gap:20px;margin-top:15px}
-.btn{width:70px;height:70px;background:#00ff88;border:none;border-radius:50%;font-size:30px}
-#startScreen{position:absolute;inset:0;background:rgba(0,0,0,0.9);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:30;border-radius:15px}
-#startBtn{padding:15px 30px;background:#00ff88;border:none;border-radius:30px;font-size:18px;font-weight:bold;margin-top:15px}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0a0a0a;color:#fff;font-family:sans-serif;overflow:hidden;display:flex;justify-content:center}
+#wrap{position:relative;width:100%;max-width:420px;height:100vh;background:#111;overflow:hidden}
+canvas{width:100%;height:100%;display:block}
+#ui{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none}
+.top{display:flex;justify-content:space-between;padding:12px}
+.box{background:rgba(0,0,0,0.7);border:1.5px solid #ff0055;border-radius:10px;padding:6px 12px}
+.controls{position:absolute;bottom:0;width:100%;display:flex;justify-content:space-between;padding:20px;pointer-events:auto}
+.btn{width:75px;height:75px;background:rgba(255,255,255,0.1);border:2px solid #fff;border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:32px}
+#horn{position:absolute;bottom:130px;left:50%;transform:translateX(-50%);width:65px;height:65px;background:gold;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;pointer-events:auto}
+#start,#over{position:absolute;top:0;left:0;width:100%;height:100%;background:#0a0a0a;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:auto;text-align:center;z-index:10}
+#over{display:none}
+h1{font-size:60px;color:#ff0055}
+.bMain{background:#ff0055;border:none;padding:16px 32px;border-radius:14px;color:#fff;font-weight:900;margin:10px}
 </style>
 </head>
 <body>
-<div id="header">KVR-GAME by Kanagaraj 🔥</div>
-<div id="gameBox">
-<div id="score">Score: 0</div>
-<div id="car">KVR</div>
-<div id="startScreen">
-<div style="font-size:24px;color:#00ff88">KVR DODGE</div>
-<div style="font-size:12px;margin-top:10px">Dodge the red blocks!</div>
-<button id="startBtn">START GAME</button>
-<div style="font-size:10px;margin-top:15px;color:#888">Created by Kanagaraj</div>
+<div id="wrap">
+<canvas id="c"></canvas>
+<div id="ui">
+<div class="top"><div class="box">SCORE <b id="sc">0</b></div><div class="box">🪙 <b id="co">0</b></div></div>
+<div id="horn">📯</div>
+<div class="controls"><div class="btn" id="L">⬅️</div><div class="btn" id="R">➡️</div></div>
 </div>
-</div>
-<div id="controls">
-<button class="btn" id="leftBtn">⬅️</button>
-<button class="btn" id="rightBtn">➡️</button>
+<div id="start"><h1>KVR<br>DODGE</h1><p style="color:#ff0055;letter-spacing:3px">MASS V2 🔥</p><p style="font-size:11px;opacity:0.6;margin:12px">Coins pudu, Horn adichu car thallu!<br>Coimbatore Mass Game</p><button class="bMain" onclick="startG()">PLAY MASS 🔥</button></div>
+<div id="over"><h1>GAME OVER</h1><p>SCORE <b id="fS">0</b> | COINS <b id="fC">0</b></p><button class="bMain" onclick="startG()">RETRY 💥</button><button style="background:#222;border:1px solid #fff;color:#fff;padding:12px 20px;border-radius:10px;margin-top:8px" onclick="share()">📲 SHARE TO FRIENDS</button></div>
 </div>
 <script>
-let car=document.getElementById('car'),gameBox=document.getElementById('gameBox'),scoreEl=document.getElementById('score'),startScreen=document.getElementById('startScreen');
-let carX=150,score=0,gameActive=false,obstacles=[],speed=3,spawnRate=1000,lastSpawn=0;
-function startGame(){gameActive=true;score=0;obstacles.forEach(o=>o.el.remove());obstacles=[];startScreen.style.display='none';carX=150;car.style.left=carX+'px';requestAnimationFrame(loop);}
-function loop(timestamp){if(!gameActive)return;score++;scoreEl.textContent='Score: '+Math.floor(score/10);if(timestamp-lastSpawn>spawnRate){spawnObstacle();lastSpawn=timestamp;if(spawnRate>400)spawnRate-=2;speed+=0.005;}moveObstacles();checkCollision();requestAnimationFrame(loop);}
-function spawnObstacle(){let el=document.createElement('div');el.className='obstacle';let x=Math.random()*250+25;el.style.left=x+'px';el.style.top='-50px';gameBox.appendChild(el);obstacles.push({el,x,y:-50});}
-function moveObstacles(){obstacles.forEach((o,i)=>{o.y+=speed;o.el.style.top=o.y+'px';if(o.y>600){o.el.remove();obstacles.splice(i,1);}});}
-function checkCollision(){obstacles.forEach(o=>{if(o.y>440&&o.y<520&&Math.abs(o.x-carX)<45){gameOver();}});}
-function gameOver(){gameActive=false;startScreen.style.display='flex';startScreen.innerHTML=`<div style="font-size:24px;color:#ff0040">GAME OVER</div><div style="font-size:18px;margin-top:10px">Score: ${Math.floor(score/10)}</div><button id="startBtn" onclick="startGame()">PLAY AGAIN</button>`;}
-document.getElementById('leftBtn').addEventListener('touchstart',()=>{if(carX>10)carX-=30;car.style.left=carX+'px';});
-document.getElementById('rightBtn').addEventListener('touchstart',()=>{if(carX<290)carX+=30;car.style.left=carX+'px';});
-document.addEventListener('keydown',(e)=>{if(e.key==='ArrowLeft'&&carX>10)carX-=30;if(e.key==='ArrowRight'&&carX<290)carX+=30;car.style.left=carX+'px';});
-document.getElementById('startBtn').addEventListener('click',startGame);
+const cv=document.getElementById('c'),ctx=cv.getContext('2d');let W,H,DPR;function sz(){W=cv.parentElement.clientWidth;H=window.innerHeight;DPR=2;cv.width=W*DPR;cv.height=H*DPR;cv.style.width=W+'px';cv.style.height=H+'px';ctx.setTransform(DPR,0,0,DPR,0,0);}sz();
+let px,score,coins,spd,obs,coin,keys={},ro=0,state='start';
+function init(){px=W/2;score=0;coins=0;spd=6;obs=[];coin=[];ro=0;keys={};}
+function spawn(){if(Math.random()<0.05)obs.push({x:W/2+(Math.random()-0.5)*W*0.6,y:-80,w:48,h:80});if(Math.random()<0.045)coin.push({x:W/2+(Math.random()-0.5)*W*0.6,y:-20,r:12});}
+function upd(){if(state!='play')return;ro+=spd;if(keys.l)px-=8;if(keys.r)px+=8;px=Math.max(40,Math.min(W-40,px));spawn();obs.forEach((o,i)=>{o.y+=spd;if(o.y>H+100)obs.splice(i,1);if(Math.abs(o.x-px)<35 && Math.abs(o.y-(H-160))<45){over();}});coin.forEach((c,i)=>{c.y+=spd;if(c.y>H)coin.splice(i,1);if(Math.hypot(c.x-px,c.y-(H-160))<28){coins++;score+=15;coin.splice(i,1);}});score+=0.12;document.getElementById('sc').textContent=Math.floor(score);document.getElementById('co').textContent=coins;spd=6+score*0.01;}
+function draw(){ctx.clearRect(0,0,W,H);ctx.fillStyle='#1a1a2e';ctx.fillRect(W*0.12,0,W*0.76,H);ctx.strokeStyle='rgba(255,255,255,0.15)';ctx.setLineDash([15,15]);ctx.beginPath();ctx.moveTo(W/2-W*0.76/6,0);ctx.lineTo(W/2-W*0.76/6,H);ctx.stroke();ctx.beginPath();ctx.moveTo(W/2+W*0.76/6,0);ctx.lineTo(W/2+W*0.76/6,H);ctx.stroke();ctx.setLineDash([]);obs.forEach(o=>{ctx.fillStyle='#ff3355';ctx.fillRect(o.x-o.w/2,o.y-o.h/2,o.w,o.h);});coin.forEach(c=>{ctx.fillStyle='gold';ctx.beginPath();ctx.arc(c.x,c.y,c.r,0,6.28);ctx.fill();ctx.fillStyle='#000';ctx.font='10px sans-serif';ctx.textAlign='center';ctx.fillText('₹',c.x,c.y+3);});ctx.font='40px serif';ctx.textAlign='center';ctx.fillText('🏍️',px,H-160);if(spd>10){ctx.fillStyle='cyan';ctx.beginPath();ctx.moveTo(px-8,H-120);ctx.lineTo(px,H-90);ctx.lineTo(px+8,H-120);ctx.fill();}}
+function loop(){upd();draw();requestAnimationFrame(loop);}loop();
+function startG(){init();state='play';document.getElementById('start').style.display='none';document.getElementById('over').style.display='none';}
+function over(){state='over';document.getElementById('fS').textContent=Math.floor(score);document.getElementById('fC').textContent=coins;document.getElementById('over').style.display='flex';localStorage.setItem('kvr',Math.max(score,localStorage.getItem('kvr')||0));}
+document.getElementById('L').addEventListener('touchstart',e=>{e.preventDefault();keys.l=true;});document.getElementById('L').addEventListener('touchend',()=>keys.l=false);
+document.getElementById('R').addEventListener('touchstart',e=>{e.preventDefault();keys.r=true;});document.getElementById('R').addEventListener('touchend',()=>keys.r=false);
+document.getElementById('horn').addEventListener('click',()=>{obs.forEach(o=>{if(Math.abs(o.x-px)<90 && o.y<H-50)o.x+=o.x>px?60:-60});});
+window.addEventListener('keydown',e=>{if(e.key=='ArrowLeft')keys.l=true;if(e.key=='ArrowRight')keys.r=true;});
+window.addEventListener('keyup',e=>{if(e.key=='ArrowLeft')keys.l=false;if(e.key=='ArrowRight')keys.r=false;});
+function share(){let t=`Dei KVR DODGE la ${Math.floor(score)} score da! 🔥 https://kanagaraj937.github.io/KVR-GAME/`;navigator.clipboard.writeText(t);alert('Copied! WhatsApp la share pannu da! 🔥');}
 </script>
 </body>
 </html>
