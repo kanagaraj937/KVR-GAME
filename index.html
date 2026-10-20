@@ -1,114 +1,66 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>KVR V4 - REAL KALVARAYAN RIDE</title>
-<style>
-*{margin:0;padding:0;box-sizing:border-box;touch-action:none}
-body{background:#050a05;overflow:hidden;font-family:monospace}
-canvas{display:block;width:100vw;height:100vh}
-.hud{position:fixed;z-index:10;color:#7CFC00;background:rgba(0,0,0,0.7);border:1px solid #2e8b57;border-radius:10px;padding:6px 10px;font-weight:900}
-#speed{bottom:20px;left:50%;transform:translateX(-50%);font-size:22px;color:#fff;border:2px solid #7CFC00;min-width:140px;text-align:center}
-#speed b{color:#7CFC00}
-#gear{top:10px;left:10px;font-size:18px}
-#km{top:10px;right:10px;color:gold}
-#ctrl{position:fixed;bottom:10px;width:100%;display:flex;justify-content:space-between;padding:0 10px;z-index:10}
-.btn{width:62px;height:62px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:26px;background:rgba(34,139,34,0.3);border:2px solid #7CFC00;color:#fff;user-select:none}
-#gearBox{position:fixed;left:10px;bottom:100px;z-index:10;display:flex;flex-direction:column;gap:8px}
-#start{position:fixed;inset:0;background:radial-gradient(ellipse at center,#1a3a1a,#050a05);z-index:20;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;text-align:center;padding:20px}
-#start h1{color:#7CFC00;font-size:40px;line-height:0.9;text-shadow:0 0 20px #2e8b57}
-button#play{background:linear-gradient(90deg,#228B22,#7CFC00);color:#000;border:none;padding:14px 28px;border-radius:12px;font-weight:900;margin-top:16px;font-size:16px}
-</style>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KVR 3D - KALVARAYAN HILLS</title>
+<style>body{margin:0;overflow:hidden;background:#000}canvas{display:block}#ui{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);color:#7CFC00;font-family:monospace;background:rgba(0,0,0,0.7);padding:8px 18px;border-radius:10px;border:1px solid #7CFC00}#start{position:fixed;inset:0;background:#000;z-index:10;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff}button{background:#7CFC00;color:#000;border:none;padding:14px 28px;font-weight:900;border-radius:10px}</style>
+<script type="importmap">{"imports":{"three":"https://unpkg.com/three@0.160.0/build/three.module.js"}}</script>
 </head>
 <body>
-<div id="gear" class="hud">GEAR: <span id="gTxt">1</span></div>
-<div id="km" class="hud">KM: <span id="kmTxt">0</span> | 🪙 <span id="coinTxt">0</span></div>
-<div id="speed" class="hud"><b id="spdTxt">0</b> KM/H <div style="font-size:10px;opacity:0.7" id="gearName">1st - MALAI START</div></div>
-<div id="gearBox"><div class="btn" id="gearUp">▲</div><div class="btn" id="gearDown">▼</div></div>
-<div id="ctrl"><div class="btn" id="left">⬅️</div><div style="display:flex;gap:10px"><div class="btn" id="horn" style="background:gold;color:#000">📯</div><div class="btn" id="brake">🛑</div></div><div class="btn" id="right">➡️</div></div>
-<div id="start"><div style="background:#7CFC00;color:#000;padding:4px 12px;border-radius:20px;font-size:10px;letter-spacing:2px;font-weight:900">KALLAKURICHI • KALVARAYAN</div><h1>KALVARAYAN<br>HILLS<br>REAL RIDE</h1><p style="color:#7CFC00;font-size:11px;margin:8px 0;letter-spacing:2px">V4 • GEAR • ANIMALS • FOG</p><p style="font-size:11px;opacity:0.7;line-height:1.5">🐒 Kurangu, 🐍 Pambu, 🐄 Maadu<br>Gear pottu vegama odu da!<br>Horn adichu vilakku!</p><button id="play" onclick="go()">START RIDE 🏍️</button></div>
-<canvas id="g"></canvas>
-<script>
-let cv=document.getElementById('g'),ctx=cv.getContext('2d'),W,H,px,score=0,coins=0,gear=1,speed=0,realSpeed=0,obs=[],coinL=[],keys={},run=false,fogT=0,curve=0;
-const gearSpeed=[0,20,45,75,105,135], gearNames=["N","1st - MALAI START","2nd - FOREST","3rd - HAIRPIN","4th - HILL TOP","5th - MASS"];
-function resize(){W=innerWidth;H=innerHeight;cv.width=W;cv.height=H;px=W/2;}resize();addEventListener('resize',resize);
-function go(){document.getElementById('start').style.display='none';run=true;reset();}
-function reset(){px=W/2;score=0;coins=0;gear=1;speed=0;obs=[];coinL=[];}
-function spawn(){
-if(Math.random()<0.055){
- let types=['monkey','snake','cow','lorry','rock','peacock'];
- let t=types[Math.floor(Math.random()*types.length)];
- obs.push({x:Math.random()*W*0.6+W*0.2,y:-80,type:t,ox:Math.random()*W*0.6+W*0.2,dx:(Math.random()-0.5)*0.8});
-}
-if(Math.random()<0.05)coinL.push({x:Math.random()*W*0.6+W*0.2,y:-20});
-curve=Math.sin(fogT*0.01)* (gear*15);
-}
-function loop(){
-requestAnimationFrame(loop);
-if(!run)return;
-fogT+=1;spawn();
-realSpeed=gearSpeed[gear]*(keys.brake?-0.3:1)* (0.6+Math.random()*0.1);
-if(keys.l)px-= (5+gear); if(keys.r)px+= (5+gear);
-px=Math.max(40,Math.min(W-40,px+curve*0.02));
-obs.forEach((o,i)=>{
- o.y+= realSpeed*0.12+3;
- if(o.type=='monkey') o.x+= Math.sin(fogT*0.05+i)*2;
- if(o.y>H+100) obs.splice(i,1);
- let hit=Math.abs(o.x-px)<34 && Math.abs(o.y-(H-150))<40;
- if(hit){
-  if(o.type=='peacock'){coins+=5;obs.splice(i,1);score+=20;return;}
-  alert((o.type=='monkey'?'DEI KURANGU ADICHUTA 🐒!':o.type=='snake'?'PAMBU DA 🐍!':'MOTTADICHITA! 🚛')+' Score: '+Math.floor(score)+' KM');
-  reset();
+<div id="start"><h1 style="color:#7CFC00">KVR 3D<br>KALVARAYAN HILLS</h1><p>Full 3D • WebGL • Real Hills</p><button onclick="start()">START 3D RIDE 🏔️</button></div>
+<div id="ui">SPEED: <span id="sp">0</span> KM/H | WASD / Swipe</div>
+<script type="module">
+import * as THREE from 'three';
+let scene,camera,renderer,bike,road,hills=[],run=false,keys={},speed=0;
+function init(){
+ scene=new THREE.Scene();scene.fog=new THREE.Fog(0x0a2a0a,40,200);
+ camera=new THREE.PerspectiveCamera(75,innerWidth/innerHeight,0.1,1000);
+ renderer=new THREE.WebGLRenderer({antialias:true});renderer.setSize(innerWidth,innerHeight);document.body.appendChild(renderer.domElement);
+ // Light
+ let sun=new THREE.DirectionalLight(0xffffff,1.5);sun.position.set(10,20,10);scene.add(sun);scene.add(new THREE.AmbientLight(0x445544,0.8));
+ // Road - 3D Plane with curves
+ let roadGeo=new THREE.PlaneGeometry(20,1000,10,100);roadGeo.rotateX(-Math.PI/2);
+ let pos=roadGeo.attributes.position;
+ for(let i=0;i<pos.count;i++){let z=pos.getZ(i);pos.setX(i,pos.getX(i)+Math.sin(z*0.03)*8); pos.setY(i,Math.sin(z*0.02)*2);} pos.needsUpdate=true;
+ let roadMat=new THREE.MeshStandardMaterial({color:0x333333}); road=new THREE.Mesh(roadGeo,roadMat);scene.add(road);
+ // Hills 3D
+ for(let i=0;i<20;i++){
+  let hGeo=new THREE.ConeGeometry(15+Math.random()*20,40+Math.random()*40,8);
+  let hMat=new THREE.MeshStandardMaterial({color:0x1a4a1a});
+  let h=new THREE.Mesh(hGeo,hMat);
+  h.position.set((Math.random()-0.5)*200,10, -Math.random()*900); scene.add(h); hills.push(h);
  }
-});
-coinL.forEach((c,i)=>{c.y+= realSpeed*0.12+3; if(c.y>H)coinL.splice(i,1); if(Math.hypot(c.x-px,c.y-(H-150))<28){coins++;score+=5;coinL.splice(i,1);}});
-score+= realSpeed*0.002;
-document.getElementById('gTxt').textContent=gear;
-document.getElementById('kmTxt').textContent=Math.floor(score);
-document.getElementById('coinTxt').textContent=coins;
-document.getElementById('spdTxt').textContent=Math.floor(realSpeed);
-document.getElementById('gearName').textContent=gearNames[gear];
-// DRAW
-ctx.fillStyle='#0a1a0a';ctx.fillRect(0,0,W,H);
-// hills
-ctx.fillStyle='#122612';ctx.beginPath();ctx.moveTo(0,H*0.28+curve*0.3);for(let x=0;x<=W;x+=18)ctx.lineTo(x,H*0.28+Math.sin(x*0.01+fogT*0.005)*22+curve*0.2);ctx.lineTo(W,H*0.28);ctx.fill();
-ctx.fillStyle='#1e3a1e';ctx.beginPath();ctx.moveTo(0,H*0.18+curve*0.2);for(let x=0;x<=W;x+=22)ctx.lineTo(x,H*0.18+Math.sin(x*0.008+fogT*0.004)*30+curve*0.15);ctx.lineTo(W,H*0.18);ctx.fill();
-// road
-let roadW=W*0.72;let roadX=W*0.14+curve;
-ctx.fillStyle='#2b3a2b';ctx.fillRect(roadX-10,0,roadW+20,H);
-ctx.fillStyle='#3a4a3a';ctx.fillRect(roadX,0,roadW,H);
-// center line
-ctx.strokeStyle= gear>=4?'rgba(124,252,0,0.6)':'rgba(124,252,0,0.25)';ctx.setLineDash(gear>=3?[20,12]:[12,18]);ctx.beginPath();ctx.moveTo(W/2+curve*0.5,0);ctx.lineTo(W/2+curve*0.5,H);ctx.stroke();ctx.setLineDash([]);
-// boards
-if(Math.floor(score)%5==0 && Math.floor(fogT)%120==0){ctx.fillStyle='#fff';ctx.fillRect(W/2-30+curve,100,60,30);ctx.fillStyle='#000';ctx.font='12px monospace';ctx.textAlign='center';ctx.fillText(Math.floor(score/5)+'/21',W/2+curve,118);}
-// obs draw
-obs.forEach(o=>{
- ctx.textAlign='center';let e='🪨';
- if(o.type=='monkey')e='🐒';if(o.type=='snake')e='🐍';if(o.type=='cow')e='🐄';if(o.type=='lorry')e='🚛';if(o.type=='rock')e='🪨';if(o.type=='peacock')e='🦚';
- ctx.font='32px Arial';ctx.fillText(e,o.x,o.y);
-});
-coinL.forEach(c=>{ctx.fillStyle='gold';ctx.beginPath();ctx.arc(c.x,c.y,11,0,6.28);ctx.fill();ctx.fillStyle='#000';ctx.font='10px monospace';ctx.textAlign='center';ctx.fillText('₹',c.x,c.y+3);});
-// bike + shadow
-ctx.fillStyle='rgba(0,0,0,0.5)';ctx.beginPath();ctx.ellipse(px,H-108,20+gear*2,7,0,0,6.28);ctx.fill();
-ctx.font=(38+gear*1.5)+'px Arial';ctx.textAlign='center';ctx.fillText('🏍️',px,H-140);
-// fog
-ctx.fillStyle='rgba(180,255,180,'+(0.04+gear*0.005)+')';ctx.fillRect(0,0,W,H*0.6);
+ // Bike 3D Box (you can change to GLB model later)
+ let bGeo=new THREE.BoxGeometry(1,0.8,2);let bMat=new THREE.MeshStandardMaterial({color:0x7CFC00});bike=new THREE.Mesh(bGeo,bMat);bike.position.set(0,0.6,10);scene.add(bike);
+ // Trees
+ for(let i=0;i<80;i++){
+  let tGeo=new THREE.ConeGeometry(0.6,3,6);let t=new THREE.Mesh(tGeo,new THREE.MeshStandardMaterial({color:0x0a5a0a}));
+  t.position.set((Math.random()>0.5?12+Math.random()*20:-12-Math.random()*20),1.5, Math.random()*1000-500);scene.add(t);
+ }
+ camera.position.set(0,5,16);camera.lookAt(0,0,0);
+ animate();
 }
-loop();
-// controls
-let K={l:false,r:false,brake:false};
-keys=K;
-document.getElementById('left').addEventListener('touchstart',e=>{e.preventDefault();K.l=true});document.getElementById('left').addEventListener('touchend',()=>K.l=false);
-document.getElementById('right').addEventListener('touchstart',e=>{e.preventDefault();K.r=true});document.getElementById('right').addEventListener('touchend',()=>K.r=false);
-document.getElementById('left').addEventListener('mousedown',()=>K.l=true);document.getElementById('left').addEventListener('mouseup',()=>K.l=false);
-document.getElementById('right').addEventListener('mousedown',()=>K.r=true);document.getElementById('right').addEventListener('mouseup',()=>K.r=false);
-document.getElementById('brake').addEventListener('touchstart',e=>{e.preventDefault();K.brake=true});document.getElementById('brake').addEventListener('touchend',()=>K.brake=false);
-document.getElementById('horn').addEventListener('touchstart',()=>{obs.forEach(o=>{if(Math.abs(o.x-px)<120 && (o.type=='monkey'||o.type=='cow')){o.x+= o.x>px?70:-70;}});});
-document.getElementById('gearUp').addEventListener('click',()=>{if(gear<5)gear++;});
-document.getElementById('gearDown').addEventListener('click',()=>{if(gear>1)gear--;});
-addEventListener('keydown',e=>{if(e.key=='ArrowLeft')K.l=true;if(e.key=='ArrowRight')K.r=true;if(e.key=='ArrowUp'&&gear<5)gear++;if(e.key=='ArrowDown'&&gear>1)gear--;if(e.key==' ')K.brake=true;});
-addEventListener('keyup',e=>{if(e.key=='ArrowLeft')K.l=false;if(e.key=='ArrowRight')K.r=false;if(e.key==' ')K.brake=false;});
+function animate(){
+ requestAnimationFrame(animate);
+ if(!run){renderer.render(scene,camera);return;}
+ if(keys.w||keys.up)speed=Math.min(0.8,speed+0.01); else speed*=0.99;
+ if(keys.s||keys.down)speed=Math.max(0,speed-0.02);
+ if(keys.a||keys.left)bike.position.x-=0.15; if(keys.d||keys.right)bike.position.x+=0.15;
+ bike.position.x=Math.max(-8,Math.min(8,bike.position.x));
+ // move road
+ road.position.z+=speed*10; if(road.position.z>400)road.position.z=0;
+ // move camera with bike
+ camera.position.x+= (bike.position.x*0.6 - camera.position.x)*0.05;
+ camera.lookAt(bike.position.x,0,bike.position.z-20);
+ // animals as boxes
+ document.getElementById('sp').textContent=Math.floor(speed*180);
+ renderer.render(scene,camera);
+}
+window.start=()=>{document.getElementById('start').style.display='none';run=true;init();}
+window.addEventListener('keydown',e=>{keys[e.key.toLowerCase()]=true; if(e.key=='ArrowLeft')keys.left=true;if(e.key=='ArrowRight')keys.right=true;if(e.key=='ArrowUp')keys.up=true;if(e.key=='ArrowDown')keys.down=true;});
+window.addEventListener('keyup',e=>{keys[e.key.toLowerCase()]=false; if(e.key=='ArrowLeft')keys.left=false;if(e.key=='ArrowRight')keys.right=false;if(e.key=='ArrowUp')keys.up=false;if(e.key=='ArrowDown')keys.down=false;});
+let sx=0;addEventListener('touchstart',e=>sx=e.touches[0].clientX);addEventListener('touchmove',e=>{let dx=e.touches[0].clientX-sx; bike.position.x+=dx*0.01; sx=e.touches[0].clientX;},{passive:false});
+addEventListener('resize',()=>{if(camera){camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);}});
 </script>
 </body>
 </html>
