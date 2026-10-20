@@ -1,53 +1,59 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>KVR DODGE - MASS EDITION 🔥</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>KVR DODGE MASS</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{background:#0a0a0a;color:#fff;font-family:sans-serif;overflow:hidden;display:flex;justify-content:center}
-#wrap{position:relative;width:100%;max-width:420px;height:100vh;background:#111;overflow:hidden}
-canvas{width:100%;height:100%;display:block}
-#ui{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none}
-.top{display:flex;justify-content:space-between;padding:12px}
-.box{background:rgba(0,0,0,0.7);border:1.5px solid #ff0055;border-radius:10px;padding:6px 12px}
-.controls{position:absolute;bottom:0;width:100%;display:flex;justify-content:space-between;padding:20px;pointer-events:auto}
-.btn{width:75px;height:75px;background:rgba(255,255,255,0.1);border:2px solid #fff;border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:32px}
-#horn{position:absolute;bottom:130px;left:50%;transform:translateX(-50%);width:65px;height:65px;background:gold;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;pointer-events:auto}
-#start,#over{position:absolute;top:0;left:0;width:100%;height:100%;background:#0a0a0a;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:auto;text-align:center;z-index:10}
-#over{display:none}
-h1{font-size:60px;color:#ff0055}
-.bMain{background:#ff0055;border:none;padding:16px 32px;border-radius:14px;color:#fff;font-weight:900;margin:10px}
+body{margin:0;background:#000;overflow:hidden;touch-action:none}
+canvas{display:block;width:100vw;height:100vh}
+#score{position:fixed;top:10px;left:10px;color:#0f0;font-family:monospace;font-size:20px;z-index:10}
+#coins{position:fixed;top:10px;right:10px;color:gold;font-family:monospace;font-size:20px;z-index:10}
+#left{position:fixed;bottom:20px;left:20px;width:80px;height:80px;background:rgba(255,0,80,0.3);border:2px solid #ff0055;border-radius:20px;color:#fff;font-size:40px;display:flex;align-items:center;justify-content:center;z-index:10}
+#right{position:fixed;bottom:20px;right:20px;width:80px;height:80px;background:rgba(255,0,80,0.3);border:2px solid #ff0055;border-radius:20px;color:#fff;font-size:40px;display:flex;align-items:center;justify-content:center;z-index:10}
+#horn{position:fixed;bottom:110px;left:50%;transform:translateX(-50%);width:70px;height:70px;background:gold;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:35px;z-index:10}
+#start{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.9);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:20;color:#fff}
+h1{color:#ff0055;font-size:50px;margin:0}
+button{background:#ff0055;color:#fff;border:none;padding:15px 30px;border-radius:12px;font-size:18px;font-weight:900;margin-top:20px}
 </style>
 </head>
 <body>
-<div id="wrap">
-<canvas id="c"></canvas>
-<div id="ui">
-<div class="top"><div class="box">SCORE <b id="sc">0</b></div><div class="box">🪙 <b id="co">0</b></div></div>
-<div id="horn">📯</div>
-<div class="controls"><div class="btn" id="L">⬅️</div><div class="btn" id="R">➡️</div></div>
-</div>
-<div id="start"><h1>KVR<br>DODGE</h1><p style="color:#ff0055;letter-spacing:3px">MASS V2 🔥</p><p style="font-size:11px;opacity:0.6;margin:12px">Coins pudu, Horn adichu car thallu!<br>Coimbatore Mass Game</p><button class="bMain" onclick="startG()">PLAY MASS 🔥</button></div>
-<div id="over"><h1>GAME OVER</h1><p>SCORE <b id="fS">0</b> | COINS <b id="fC">0</b></p><button class="bMain" onclick="startG()">RETRY 💥</button><button style="background:#222;border:1px solid #fff;color:#fff;padding:12px 20px;border-radius:10px;margin-top:8px" onclick="share()">📲 SHARE TO FRIENDS</button></div>
-</div>
+<div id="score">SCORE: <span id="s">0</span></div>
+<div id="coins">🪙 <span id="c2">0</span></div>
+<div id="left">⬅️</div><div id="right">➡️</div><div id="horn">📯</div>
+<div id="start"><h1>KVR<br>DODGE</h1><p>MASS V2 🔥</p><button onclick="go()">PLAY MASS 🔥</button></div>
+<canvas id="g"></canvas>
 <script>
-const cv=document.getElementById('c'),ctx=cv.getContext('2d');let W,H,DPR;function sz(){W=cv.parentElement.clientWidth;H=window.innerHeight;DPR=2;cv.width=W*DPR;cv.height=H*DPR;cv.style.width=W+'px';cv.style.height=H+'px';ctx.setTransform(DPR,0,0,DPR,0,0);}sz();
-let px,score,coins,spd,obs,coin,keys={},ro=0,state='start';
-function init(){px=W/2;score=0;coins=0;spd=6;obs=[];coin=[];ro=0;keys={};}
-function spawn(){if(Math.random()<0.05)obs.push({x:W/2+(Math.random()-0.5)*W*0.6,y:-80,w:48,h:80});if(Math.random()<0.045)coin.push({x:W/2+(Math.random()-0.5)*W*0.6,y:-20,r:12});}
-function upd(){if(state!='play')return;ro+=spd;if(keys.l)px-=8;if(keys.r)px+=8;px=Math.max(40,Math.min(W-40,px));spawn();obs.forEach((o,i)=>{o.y+=spd;if(o.y>H+100)obs.splice(i,1);if(Math.abs(o.x-px)<35 && Math.abs(o.y-(H-160))<45){over();}});coin.forEach((c,i)=>{c.y+=spd;if(c.y>H)coin.splice(i,1);if(Math.hypot(c.x-px,c.y-(H-160))<28){coins++;score+=15;coin.splice(i,1);}});score+=0.12;document.getElementById('sc').textContent=Math.floor(score);document.getElementById('co').textContent=coins;spd=6+score*0.01;}
-function draw(){ctx.clearRect(0,0,W,H);ctx.fillStyle='#1a1a2e';ctx.fillRect(W*0.12,0,W*0.76,H);ctx.strokeStyle='rgba(255,255,255,0.15)';ctx.setLineDash([15,15]);ctx.beginPath();ctx.moveTo(W/2-W*0.76/6,0);ctx.lineTo(W/2-W*0.76/6,H);ctx.stroke();ctx.beginPath();ctx.moveTo(W/2+W*0.76/6,0);ctx.lineTo(W/2+W*0.76/6,H);ctx.stroke();ctx.setLineDash([]);obs.forEach(o=>{ctx.fillStyle='#ff3355';ctx.fillRect(o.x-o.w/2,o.y-o.h/2,o.w,o.h);});coin.forEach(c=>{ctx.fillStyle='gold';ctx.beginPath();ctx.arc(c.x,c.y,c.r,0,6.28);ctx.fill();ctx.fillStyle='#000';ctx.font='10px sans-serif';ctx.textAlign='center';ctx.fillText('₹',c.x,c.y+3);});ctx.font='40px serif';ctx.textAlign='center';ctx.fillText('🏍️',px,H-160);if(spd>10){ctx.fillStyle='cyan';ctx.beginPath();ctx.moveTo(px-8,H-120);ctx.lineTo(px,H-90);ctx.lineTo(px+8,H-120);ctx.fill();}}
-function loop(){upd();draw();requestAnimationFrame(loop);}loop();
-function startG(){init();state='play';document.getElementById('start').style.display='none';document.getElementById('over').style.display='none';}
-function over(){state='over';document.getElementById('fS').textContent=Math.floor(score);document.getElementById('fC').textContent=coins;document.getElementById('over').style.display='flex';localStorage.setItem('kvr',Math.max(score,localStorage.getItem('kvr')||0));}
-document.getElementById('L').addEventListener('touchstart',e=>{e.preventDefault();keys.l=true;});document.getElementById('L').addEventListener('touchend',()=>keys.l=false);
-document.getElementById('R').addEventListener('touchstart',e=>{e.preventDefault();keys.r=true;});document.getElementById('R').addEventListener('touchend',()=>keys.r=false);
-document.getElementById('horn').addEventListener('click',()=>{obs.forEach(o=>{if(Math.abs(o.x-px)<90 && o.y<H-50)o.x+=o.x>px?60:-60});});
-window.addEventListener('keydown',e=>{if(e.key=='ArrowLeft')keys.l=true;if(e.key=='ArrowRight')keys.r=true;});
-window.addEventListener('keyup',e=>{if(e.key=='ArrowLeft')keys.l=false;if(e.key=='ArrowRight')keys.r=false;});
-function share(){let t=`Dei KVR DODGE la ${Math.floor(score)} score da! 🔥 https://kanagaraj937.github.io/KVR-GAME/`;navigator.clipboard.writeText(t);alert('Copied! WhatsApp la share pannu da! 🔥');}
+let cv=document.getElementById('g'),ctx=cv.getContext('2d'),W,H,px,score=0,coins=0,spd=6,obs=[],coin=[],keys={},run=false;
+function resize(){W=innerWidth;H=innerHeight;cv.width=W;cv.height=H;px=W/2;}resize();
+addEventListener('resize',resize);
+function go(){document.getElementById('start').style.display='none';run=true;init();}
+function init(){px=W/2;score=0;coins=0;spd=6;obs=[];coin=[];}
+function spawn(){if(Math.random()<0.04)obs.push({x:Math.random()*W*0.7+W*0.15,y:-80});if(Math.random()<0.03)coin.push({x:Math.random()*W*0.7+W*0.15,y:-20});}
+function loop(){
+if(!run){requestAnimationFrame(loop);return;}
+spawn();
+if(keys.l)px-=7;if(keys.r)px+=7;px=Math.max(20,Math.min(W-20,px));
+obs.forEach((o,i)=>{o.y+=spd;if(o.y>H+80)obs.splice(i,1);if(Math.abs(o.x-px)<30 && Math.abs(o.y-(H-150))<40){alert('GAME OVER! Score:'+Math.floor(score));init();}});
+coin.forEach((c,i)=>{c.y+=spd;if(c.y>H)coin.splice(i,1);if(Math.hypot(c.x-px,c.y-(H-150))<30){coins++;score+=10;coin.splice(i,1);}});
+score+=0.1;spd=6+score*0.01;
+document.getElementById('s').textContent=Math.floor(score);
+document.getElementById('c2').textContent=coins;
+ctx.fillStyle='#111';ctx.fillRect(0,0,W,H);
+ctx.fillStyle='#222';ctx.fillRect(W*0.1,0,W*0.8,H);
+ctx.fillStyle='#ff3355';obs.forEach(o=>{ctx.fillRect(o.x-20,o.y-20,40,40);});
+ctx.fillStyle='gold';coin.forEach(c=>{ctx.beginPath();ctx.arc(c.x,c.y,10,0,6.28);ctx.fill();});
+ctx.font='40px Arial';ctx.textAlign='center';ctx.fillText('🏍️',px,H-150);
+requestAnimationFrame(loop);
+}loop();
+let L=document.getElementById('left'),R=document.getElementById('right'),Ho=document.getElementById('horn');
+L.addEventListener('touchstart',e=>{e.preventDefault();keys.l=true;});L.addEventListener('touchend',()=>keys.l=false);
+R.addEventListener('touchstart',e=>{e.preventDefault();keys.r=true;});R.addEventListener('touchend',()=>keys.r=false);
+L.addEventListener('mousedown',()=>keys.l=true);L.addEventListener('mouseup',()=>keys.l=false);
+R.addEventListener('mousedown',()=>keys.r=true);R.addEventListener('mouseup',()=>keys.r=false);
+Ho.addEventListener('touchstart',()=>{obs.forEach(o=>{if(Math.abs(o.x-px)<80)o.x+=o.x>px?50:-50;});});
+addEventListener('keydown',e=>{if(e.key=='ArrowLeft')keys.l=true;if(e.key=='ArrowRight')keys.r=true;});
+addEventListener('keyup',e=>{if(e.key=='ArrowLeft')keys.l=false;if(e.key=='ArrowRight')keys.r=false;});
 </script>
 </body>
 </html>
