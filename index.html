@@ -3,83 +3,112 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>KVR - KALVARAYAN HILLS RIDE ⛰️</title>
+<title>KVR V4 - REAL KALVARAYAN RIDE</title>
 <style>
-body{margin:0;background:#0a1a0a;overflow:hidden;touch-action:none}
+*{margin:0;padding:0;box-sizing:border-box;touch-action:none}
+body{background:#050a05;overflow:hidden;font-family:monospace}
 canvas{display:block;width:100vw;height:100vh}
-#score{position:fixed;top:10px;left:10px;color:#7CFC00;font-family:monospace;font-size:18px;z-index:10;background:rgba(0,0,0,0.6);padding:6px 10px;border-radius:8px;border:1px solid #2e8b57}
-#coins{position:fixed;top:10px;right:10px;color:#ffd700;font-family:monospace;font-size:18px;z-index:10;background:rgba(0,0,0,0.6);padding:6px 10px;border-radius:8px;border:1px solid gold}
-#left{position:fixed;bottom:20px;left:20px;width:80px;height:80px;background:rgba(34,139,34,0.4);border:2px solid #7CFC00;border-radius:20px;color:#fff;font-size:36px;display:flex;align-items:center;justify-content:center;z-index:10}
-#right{position:fixed;bottom:20px;right:20px;width:80px;height:80px;background:rgba(34,139,34,0.4);border:2px solid #7CFC00;border-radius:20px;color:#fff;font-size:36px;display:flex;align-items:center;justify-content:center;z-index:10}
-#horn{position:fixed;bottom:110px;left:50%;transform:translateX(-50%);width:70px;height:70px;background:radial-gradient(circle,#ffd700,#ff8c00);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:32px;z-index:10;border:3px solid #fff;box-shadow:0 0 15px gold}
-#start{position:fixed;top:0;left:0;width:100%;height:100%;background:radial-gradient(ellipse at bottom,#1a3a1a 0%,#0a1a0a 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:20;color:#fff;text-align:center;padding:20px}
-h1{color:#7CFC00;font-size:42px;margin:0;line-height:0.9;text-shadow:0 0 20px #2e8b57}
-button{background:linear-gradient(90deg,#228B22,#7CFC00);color:#000;border:none;padding:16px 32px;border-radius:14px;font-size:16px;font-weight:900;margin-top:20px;letter-spacing:1px}
-.badge{background:linear-gradient(90deg,#2e8b57,#7CFC00);padding:5px 14px;border-radius:20px;font-size:10px;letter-spacing:2px;margin-bottom:14px;color:#000;font-weight:900}
+.hud{position:fixed;z-index:10;color:#7CFC00;background:rgba(0,0,0,0.7);border:1px solid #2e8b57;border-radius:10px;padding:6px 10px;font-weight:900}
+#speed{bottom:20px;left:50%;transform:translateX(-50%);font-size:22px;color:#fff;border:2px solid #7CFC00;min-width:140px;text-align:center}
+#speed b{color:#7CFC00}
+#gear{top:10px;left:10px;font-size:18px}
+#km{top:10px;right:10px;color:gold}
+#ctrl{position:fixed;bottom:10px;width:100%;display:flex;justify-content:space-between;padding:0 10px;z-index:10}
+.btn{width:62px;height:62px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:26px;background:rgba(34,139,34,0.3);border:2px solid #7CFC00;color:#fff;user-select:none}
+#gearBox{position:fixed;left:10px;bottom:100px;z-index:10;display:flex;flex-direction:column;gap:8px}
+#start{position:fixed;inset:0;background:radial-gradient(ellipse at center,#1a3a1a,#050a05);z-index:20;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;text-align:center;padding:20px}
+#start h1{color:#7CFC00;font-size:40px;line-height:0.9;text-shadow:0 0 20px #2e8b57}
+button#play{background:linear-gradient(90deg,#228B22,#7CFC00);color:#000;border:none;padding:14px 28px;border-radius:12px;font-weight:900;margin-top:16px;font-size:16px}
 </style>
 </head>
 <body>
-<div id="score">KM: <span id="s">0</span></div>
-<div id="coins">🪙 <span id="c2">0</span></div>
-<div id="left">⬅️</div><div id="right">➡️</div><div id="horn">📯</div>
-<div id="start">
-<div class="badge">KALLAKURICHI MASS ⛰️</div>
-<h1>KALVARAYAN<br>HILLS<br>RIDE</h1>
-<p style="color:#7CFC00;letter-spacing:3px;font-size:12px;margin:10px 0">KVR EDITION 🔥</p>
-<p style="font-size:11px;opacity:0.7;line-height:1.6">Malai paathai la bike ottu da!<br>Forest lorry-a dodge pannu,<br>Coins pudu, Horn adichu vilakku!</p>
-<button onclick="go()">RIDE START 🏔️🔥</button>
-<p style="font-size:9px;opacity:0.4;margin-top:14px">MADE BY KANAGARAJ | KVR GAMES</p>
-</div>
+<div id="gear" class="hud">GEAR: <span id="gTxt">1</span></div>
+<div id="km" class="hud">KM: <span id="kmTxt">0</span> | 🪙 <span id="coinTxt">0</span></div>
+<div id="speed" class="hud"><b id="spdTxt">0</b> KM/H <div style="font-size:10px;opacity:0.7" id="gearName">1st - MALAI START</div></div>
+<div id="gearBox"><div class="btn" id="gearUp">▲</div><div class="btn" id="gearDown">▼</div></div>
+<div id="ctrl"><div class="btn" id="left">⬅️</div><div style="display:flex;gap:10px"><div class="btn" id="horn" style="background:gold;color:#000">📯</div><div class="btn" id="brake">🛑</div></div><div class="btn" id="right">➡️</div></div>
+<div id="start"><div style="background:#7CFC00;color:#000;padding:4px 12px;border-radius:20px;font-size:10px;letter-spacing:2px;font-weight:900">KALLAKURICHI • KALVARAYAN</div><h1>KALVARAYAN<br>HILLS<br>REAL RIDE</h1><p style="color:#7CFC00;font-size:11px;margin:8px 0;letter-spacing:2px">V4 • GEAR • ANIMALS • FOG</p><p style="font-size:11px;opacity:0.7;line-height:1.5">🐒 Kurangu, 🐍 Pambu, 🐄 Maadu<br>Gear pottu vegama odu da!<br>Horn adichu vilakku!</p><button id="play" onclick="go()">START RIDE 🏍️</button></div>
 <canvas id="g"></canvas>
 <script>
-let cv=document.getElementById('g'),ctx=cv.getContext('2d'),W,H,px,score=0,coins=0,spd=6,obs=[],coin=[],keys={},run=false,trees=[],fog=0;
-function resize(){W=innerWidth;H=innerHeight;cv.width=W;cv.height=H;px=W/2;trees=[];for(let i=0;i<20;i++)trees.push({x:Math.random()*W,y:Math.random()*H, s:Math.random()*0.8+0.5});}resize();
-addEventListener('resize',resize);
-function go(){document.getElementById('start').style.display='none';run=true;init();}
-function init(){px=W/2;score=0;coins=0;spd=6;obs=[];coin=[];}
-function spawn(){if(Math.random()<0.045)obs.push({x:Math.random()*W*0.6+W*0.2,y:-80,type:Math.random()>0.5?'lorry':'rock'});if(Math.random()<0.04)coin.push({x:Math.random()*W*0.6+W*0.2,y:-20});}
+let cv=document.getElementById('g'),ctx=cv.getContext('2d'),W,H,px,score=0,coins=0,gear=1,speed=0,realSpeed=0,obs=[],coinL=[],keys={},run=false,fogT=0,curve=0;
+const gearSpeed=[0,20,45,75,105,135], gearNames=["N","1st - MALAI START","2nd - FOREST","3rd - HAIRPIN","4th - HILL TOP","5th - MASS"];
+function resize(){W=innerWidth;H=innerHeight;cv.width=W;cv.height=H;px=W/2;}resize();addEventListener('resize',resize);
+function go(){document.getElementById('start').style.display='none';run=true;reset();}
+function reset(){px=W/2;score=0;coins=0;gear=1;speed=0;obs=[];coinL=[];}
+function spawn(){
+if(Math.random()<0.055){
+ let types=['monkey','snake','cow','lorry','rock','peacock'];
+ let t=types[Math.floor(Math.random()*types.length)];
+ obs.push({x:Math.random()*W*0.6+W*0.2,y:-80,type:t,ox:Math.random()*W*0.6+W*0.2,dx:(Math.random()-0.5)*0.8});
+}
+if(Math.random()<0.05)coinL.push({x:Math.random()*W*0.6+W*0.2,y:-20});
+curve=Math.sin(fogT*0.01)* (gear*15);
+}
 function loop(){
-if(!run){requestAnimationFrame(loop);return;}
-spawn();fog+=0.02;
-if(keys.l)px-=7;if(keys.r)px+=7;px=Math.max(30,Math.min(W-30,px));
-obs.forEach((o,i)=>{o.y+=spd;if(o.y>H+80)obs.splice(i,1);if(Math.abs(o.x-px)<32 && Math.abs(o.y-(H-150))<42){alert('DEI MALAI LA VIZHUNTA DA! 😅 Score:'+Math.floor(score)+' KM');init();}});
-coin.forEach((c,i)=>{c.y+=spd;if(c.y>H)coin.splice(i,1);if(Math.hypot(c.x-px,c.y-(H-150))<30){coins++;score+=12;coin.splice(i,1);}});
-score+=0.12;spd=6+score*0.012;
-document.getElementById('s').textContent=Math.floor(score);
-document.getElementById('c2').textContent=coins;
-// BG
-ctx.fillStyle='#0a1a0a';ctx.fillRect(0,0,W,H);
-// Hills bg
-ctx.fillStyle='#122612';ctx.beginPath();ctx.moveTo(0,H*0.3);for(let x=0;x<W;x+=20){ctx.lineTo(x,H*0.3+Math.sin(x*0.01+fog)*20);}ctx.lineTo(W,H*0.3);ctx.fill();
-ctx.fillStyle='#1a331a';ctx.beginPath();ctx.moveTo(0,H*0.2);for(let x=0;x<W;x+=25){ctx.lineTo(x,H*0.2+Math.sin(x*0.008+fog*0.5)*30);}ctx.lineTo(W,H*0.2);ctx.fill();
-// Road
-ctx.fillStyle='#2a3a2a';ctx.fillRect(W*0.12,0,W*0.76,H);
-ctx.fillStyle='#3a4a3a';ctx.fillRect(W*0.14,0,W*0.72,H);
-// Lane line
-ctx.strokeStyle='rgba(124,252,0,0.3)';ctx.setLineDash([18,18]);ctx.beginPath();ctx.moveTo(W/2,0);ctx.lineTo(W/2,H);ctx.stroke();ctx.setLineDash([]);
-// Trees side
-ctx.fillStyle='rgba(34,100,34,0.5)';trees.forEach(t=>{ctx.beginPath();ctx.arc(t.x%W,H*0.5+Math.sin(fog+t.s)*10,t.s*4,0,6.28);ctx.fill();});
-// Obs
-obs.forEach(o=>{
-if(o.type=='lorry'){ctx.fillStyle='#8B4513';ctx.fillRect(o.x-22,o.y-25,44,50);ctx.fillStyle='#5a2a10';ctx.fillRect(o.x-22,o.y+15,44,10);}
-else {ctx.fillStyle='#555';ctx.beginPath();ctx.arc(o.x,o.y,18,0,6.28);ctx.fill();}
-});
-ctx.fillStyle='gold';coin.forEach(c=>{ctx.beginPath();ctx.arc(c.x,c.y,10,0,6.28);ctx.fill();ctx.fillStyle='#000';ctx.font='10px sans-serif';ctx.textAlign='center';ctx.fillText('₹',c.x,c.y+3);ctx.fillStyle='gold';});
-// Bike
-ctx.font='42px Arial';ctx.textAlign='center';ctx.fillText('🏍️',px,H-150);
-ctx.fillStyle='rgba(0,0,0,0.4)';ctx.beginPath();ctx.ellipse(px,H-115,18,6,0,0,6.28);ctx.fill();
-// Fog
-ctx.fillStyle='rgba(200,255,200,0.03)';ctx.fillRect(0,0,W,H);
 requestAnimationFrame(loop);
-}loop();
-let L=document.getElementById('left'),R=document.getElementById('right'),Ho=document.getElementById('horn');
-L.addEventListener('touchstart',e=>{e.preventDefault();keys.l=true;});L.addEventListener('touchend',()=>keys.l=false);
-R.addEventListener('touchstart',e=>{e.preventDefault();keys.r=true;});R.addEventListener('touchend',()=>keys.r=false);
-L.addEventListener('mousedown',()=>keys.l=true);L.addEventListener('mouseup',()=>keys.l=false);
-R.addEventListener('mousedown',()=>keys.r=true);R.addEventListener('mouseup',()=>keys.r=false);
-Ho.addEventListener('touchstart',()=>{obs.forEach(o=>{if(Math.abs(o.x-px)<90)o.x+=o.x>px?55:-55;});});
-addEventListener('keydown',e=>{if(e.key=='ArrowLeft')keys.l=true;if(e.key=='ArrowRight')keys.r=true;});
-addEventListener('keyup',e=>{if(e.key=='ArrowLeft')keys.l=false;if(e.key=='ArrowRight')keys.r=false;});
+if(!run)return;
+fogT+=1;spawn();
+realSpeed=gearSpeed[gear]*(keys.brake?-0.3:1)* (0.6+Math.random()*0.1);
+if(keys.l)px-= (5+gear); if(keys.r)px+= (5+gear);
+px=Math.max(40,Math.min(W-40,px+curve*0.02));
+obs.forEach((o,i)=>{
+ o.y+= realSpeed*0.12+3;
+ if(o.type=='monkey') o.x+= Math.sin(fogT*0.05+i)*2;
+ if(o.y>H+100) obs.splice(i,1);
+ let hit=Math.abs(o.x-px)<34 && Math.abs(o.y-(H-150))<40;
+ if(hit){
+  if(o.type=='peacock'){coins+=5;obs.splice(i,1);score+=20;return;}
+  alert((o.type=='monkey'?'DEI KURANGU ADICHUTA 🐒!':o.type=='snake'?'PAMBU DA 🐍!':'MOTTADICHITA! 🚛')+' Score: '+Math.floor(score)+' KM');
+  reset();
+ }
+});
+coinL.forEach((c,i)=>{c.y+= realSpeed*0.12+3; if(c.y>H)coinL.splice(i,1); if(Math.hypot(c.x-px,c.y-(H-150))<28){coins++;score+=5;coinL.splice(i,1);}});
+score+= realSpeed*0.002;
+document.getElementById('gTxt').textContent=gear;
+document.getElementById('kmTxt').textContent=Math.floor(score);
+document.getElementById('coinTxt').textContent=coins;
+document.getElementById('spdTxt').textContent=Math.floor(realSpeed);
+document.getElementById('gearName').textContent=gearNames[gear];
+// DRAW
+ctx.fillStyle='#0a1a0a';ctx.fillRect(0,0,W,H);
+// hills
+ctx.fillStyle='#122612';ctx.beginPath();ctx.moveTo(0,H*0.28+curve*0.3);for(let x=0;x<=W;x+=18)ctx.lineTo(x,H*0.28+Math.sin(x*0.01+fogT*0.005)*22+curve*0.2);ctx.lineTo(W,H*0.28);ctx.fill();
+ctx.fillStyle='#1e3a1e';ctx.beginPath();ctx.moveTo(0,H*0.18+curve*0.2);for(let x=0;x<=W;x+=22)ctx.lineTo(x,H*0.18+Math.sin(x*0.008+fogT*0.004)*30+curve*0.15);ctx.lineTo(W,H*0.18);ctx.fill();
+// road
+let roadW=W*0.72;let roadX=W*0.14+curve;
+ctx.fillStyle='#2b3a2b';ctx.fillRect(roadX-10,0,roadW+20,H);
+ctx.fillStyle='#3a4a3a';ctx.fillRect(roadX,0,roadW,H);
+// center line
+ctx.strokeStyle= gear>=4?'rgba(124,252,0,0.6)':'rgba(124,252,0,0.25)';ctx.setLineDash(gear>=3?[20,12]:[12,18]);ctx.beginPath();ctx.moveTo(W/2+curve*0.5,0);ctx.lineTo(W/2+curve*0.5,H);ctx.stroke();ctx.setLineDash([]);
+// boards
+if(Math.floor(score)%5==0 && Math.floor(fogT)%120==0){ctx.fillStyle='#fff';ctx.fillRect(W/2-30+curve,100,60,30);ctx.fillStyle='#000';ctx.font='12px monospace';ctx.textAlign='center';ctx.fillText(Math.floor(score/5)+'/21',W/2+curve,118);}
+// obs draw
+obs.forEach(o=>{
+ ctx.textAlign='center';let e='🪨';
+ if(o.type=='monkey')e='🐒';if(o.type=='snake')e='🐍';if(o.type=='cow')e='🐄';if(o.type=='lorry')e='🚛';if(o.type=='rock')e='🪨';if(o.type=='peacock')e='🦚';
+ ctx.font='32px Arial';ctx.fillText(e,o.x,o.y);
+});
+coinL.forEach(c=>{ctx.fillStyle='gold';ctx.beginPath();ctx.arc(c.x,c.y,11,0,6.28);ctx.fill();ctx.fillStyle='#000';ctx.font='10px monospace';ctx.textAlign='center';ctx.fillText('₹',c.x,c.y+3);});
+// bike + shadow
+ctx.fillStyle='rgba(0,0,0,0.5)';ctx.beginPath();ctx.ellipse(px,H-108,20+gear*2,7,0,0,6.28);ctx.fill();
+ctx.font=(38+gear*1.5)+'px Arial';ctx.textAlign='center';ctx.fillText('🏍️',px,H-140);
+// fog
+ctx.fillStyle='rgba(180,255,180,'+(0.04+gear*0.005)+')';ctx.fillRect(0,0,W,H*0.6);
+}
+loop();
+// controls
+let K={l:false,r:false,brake:false};
+keys=K;
+document.getElementById('left').addEventListener('touchstart',e=>{e.preventDefault();K.l=true});document.getElementById('left').addEventListener('touchend',()=>K.l=false);
+document.getElementById('right').addEventListener('touchstart',e=>{e.preventDefault();K.r=true});document.getElementById('right').addEventListener('touchend',()=>K.r=false);
+document.getElementById('left').addEventListener('mousedown',()=>K.l=true);document.getElementById('left').addEventListener('mouseup',()=>K.l=false);
+document.getElementById('right').addEventListener('mousedown',()=>K.r=true);document.getElementById('right').addEventListener('mouseup',()=>K.r=false);
+document.getElementById('brake').addEventListener('touchstart',e=>{e.preventDefault();K.brake=true});document.getElementById('brake').addEventListener('touchend',()=>K.brake=false);
+document.getElementById('horn').addEventListener('touchstart',()=>{obs.forEach(o=>{if(Math.abs(o.x-px)<120 && (o.type=='monkey'||o.type=='cow')){o.x+= o.x>px?70:-70;}});});
+document.getElementById('gearUp').addEventListener('click',()=>{if(gear<5)gear++;});
+document.getElementById('gearDown').addEventListener('click',()=>{if(gear>1)gear--;});
+addEventListener('keydown',e=>{if(e.key=='ArrowLeft')K.l=true;if(e.key=='ArrowRight')K.r=true;if(e.key=='ArrowUp'&&gear<5)gear++;if(e.key=='ArrowDown'&&gear>1)gear--;if(e.key==' ')K.brake=true;});
+addEventListener('keyup',e=>{if(e.key=='ArrowLeft')K.l=false;if(e.key=='ArrowRight')K.r=false;if(e.key==' ')K.brake=false;});
 </script>
 </body>
 </html>
