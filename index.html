@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KVR DODGE - by Kanagaraj</title>
+<style>
+body{margin:0;background:#0f0f0f;color:white;font-family:sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;overflow:hidden}
+#header{font-size:22px;margin:10px;color:#00ff88}
+#gameBox{position:relative;width:350px;height:550px;background:#222;border:3px solid #00ff88;border-radius:15px;overflow:hidden}
+#car{position:absolute;width:50px;height:80px;bottom:20px;left:150px;background:#00ff88;border-radius:10px;z-index:10;display:flex;align-items:center;justify-content:center;color:#000;font-weight:bold;font-size:10px}
+.obstacle{position:absolute;width:50px;height:50px;background:#ff0040;border-radius:8px}
+#score{position:absolute;top:10px;left:10px;font-size:18px;z-index:20}
+#controls{display:flex;gap:20px;margin-top:15px}
+.btn{width:70px;height:70px;background:#00ff88;border:none;border-radius:50%;font-size:30px}
+#startScreen{position:absolute;inset:0;background:rgba(0,0,0,0.9);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:30;border-radius:15px}
+#startBtn{padding:15px 30px;background:#00ff88;border:none;border-radius:30px;font-size:18px;font-weight:bold;margin-top:15px}
+</style>
+</head>
+<body>
+<div id="header">KVR-GAME by Kanagaraj 🔥</div>
+<div id="gameBox">
+<div id="score">Score: 0</div>
+<div id="car">KVR</div>
+<div id="startScreen">
+<div style="font-size:24px;color:#00ff88">KVR DODGE</div>
+<div style="font-size:12px;margin-top:10px">Dodge the red blocks!</div>
+<button id="startBtn">START GAME</button>
+<div style="font-size:10px;margin-top:15px;color:#888">Created by Kanagaraj</div>
+</div>
+</div>
+<div id="controls">
+<button class="btn" id="leftBtn">⬅️</button>
+<button class="btn" id="rightBtn">➡️</button>
+</div>
+<script>
+let car=document.getElementById('car'),gameBox=document.getElementById('gameBox'),scoreEl=document.getElementById('score'),startScreen=document.getElementById('startScreen');
+let carX=150,score=0,gameActive=false,obstacles=[],speed=3,spawnRate=1000,lastSpawn=0;
+function startGame(){gameActive=true;score=0;obstacles.forEach(o=>o.el.remove());obstacles=[];startScreen.style.display='none';carX=150;car.style.left=carX+'px';requestAnimationFrame(loop);}
+function loop(timestamp){if(!gameActive)return;score++;scoreEl.textContent='Score: '+Math.floor(score/10);if(timestamp-lastSpawn>spawnRate){spawnObstacle();lastSpawn=timestamp;if(spawnRate>400)spawnRate-=2;speed+=0.005;}moveObstacles();checkCollision();requestAnimationFrame(loop);}
+function spawnObstacle(){let el=document.createElement('div');el.className='obstacle';let x=Math.random()*250+25;el.style.left=x+'px';el.style.top='-50px';gameBox.appendChild(el);obstacles.push({el,x,y:-50});}
+function moveObstacles(){obstacles.forEach((o,i)=>{o.y+=speed;o.el.style.top=o.y+'px';if(o.y>600){o.el.remove();obstacles.splice(i,1);}});}
+function checkCollision(){obstacles.forEach(o=>{if(o.y>440&&o.y<520&&Math.abs(o.x-carX)<45){gameOver();}});}
+function gameOver(){gameActive=false;startScreen.style.display='flex';startScreen.innerHTML=`<div style="font-size:24px;color:#ff0040">GAME OVER</div><div style="font-size:18px;margin-top:10px">Score: ${Math.floor(score/10)}</div><button id="startBtn" onclick="startGame()">PLAY AGAIN</button>`;}
+document.getElementById('leftBtn').addEventListener('touchstart',()=>{if(carX>10)carX-=30;car.style.left=carX+'px';});
+document.getElementById('rightBtn').addEventListener('touchstart',()=>{if(carX<290)carX+=30;car.style.left=carX+'px';});
+document.addEventListener('keydown',(e)=>{if(e.key==='ArrowLeft'&&carX>10)carX-=30;if(e.key==='ArrowRight'&&carX<290)carX+=30;car.style.left=carX+'px';});
+document.getElementById('startBtn').addEventListener('click',startGame);
+</script>
+</body>
+</html>
